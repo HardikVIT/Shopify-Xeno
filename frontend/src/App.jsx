@@ -2,10 +2,10 @@ import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
-import Products from "./pages/Products";
+import Products from "./pages/products";
 import Customers from "./pages/Customers";
-import Orders from "./pages/Orders";
-import Sync from "./pages/Sync";
+import Orders from "./pages/orders";
+
 
 export default function App() {
   return (
@@ -16,7 +16,7 @@ export default function App() {
         <Route path="/products" element={<Products />} />
         <Route path="/customers" element={<Customers />} />
         <Route path="/orders" element={<Orders />} />
-        <Route path="/sync" element={<Sync />} />
+
       </Routes>
     </Layout>
   );

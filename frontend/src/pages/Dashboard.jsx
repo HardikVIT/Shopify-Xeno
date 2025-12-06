@@ -12,7 +12,7 @@ export default function Dashboard() {
       </p>
       <p className="small">
         Use the quick navigation above to view analytics, products, customers,
-        orders, or sync data from Shopify.
+        orders data from Shopify.
       </p>
     </div>
   );

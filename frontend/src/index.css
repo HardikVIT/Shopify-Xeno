@@ -91,3 +91,22 @@ h2 {
 .app-header {
   margin-bottom: 16px;
 }
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.data-table th, .data-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+.data-table th {
+  background: #eee;
+  font-weight: bold;
+}
+
+.data-table tr:nth-child(even) {
+  background: #f9f9f9;
+}
