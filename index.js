@@ -17,24 +17,14 @@ const API_SECRET = process.env.SHOPIFY_API_SECRET;
 const SCOPES = process.env.SCOPES;
 const APP_URL = process.env.APP_URL;
 
-// ---------------- PATHS ----------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// -----------------------------------------------
-// 1️⃣ RAW BODY MIDDLEWARE FOR WEBHOOKS ONLY
-// -----------------------------------------------
-// This must be before express.json()
 app.use("/webhooks/orders/create", express.raw({ type: "application/json" }));
-
-// Normal JSON parsing for all other routes
 app.use(express.json());
 
+
 // -----------------------------------------------
-// 2️⃣ MYSQL (Aiven) CONNECTION
-// -----------------------------------------------
-// -----------------------------------------------
-// 2️⃣ MYSQL (Aiven) CONNECTION
+// MYSQL (Aiven) CONNECTION
 // -----------------------------------------------
 
 let sslConfig = undefined;
@@ -94,7 +84,7 @@ async function getToken(shop) {
 }
 
 // -----------------------------------------------
-// 3️⃣ AUTH FLOW
+// AUTH
 // -----------------------------------------------
 app.get("/auth", (req, res) => {
   const { shop } = req.query;
@@ -110,7 +100,6 @@ app.get("/auth", (req, res) => {
   res.redirect(installUrl);
 });
 
-// Check if a shop already has a token
 app.get("/api/check-auth", async (req, res) => {
   const shop = req.query.shop;
   if (!shop) return res.json({ authenticated: false });
@@ -143,7 +132,7 @@ app.get("/auth/callback", async (req, res) => {
 });
 
 // -----------------------------------------------
-// 4️⃣ PRODUCTS API
+// PRODUCTS API
 // -----------------------------------------------
 app.get("/api/products", async (req, res) => {
   const shop = req.query.shop;
@@ -194,7 +183,7 @@ app.get("/api/products", async (req, res) => {
 });
 
 // -----------------------------------------------
-// 5️⃣ ORDER WEBHOOK (NO EARLY HMAC BLOCK)
+// ORDER WEBHOOK 
 // -----------------------------------------------
 app.post("/webhooks/orders/create", async (req, res) => {
   try {
@@ -221,13 +210,6 @@ app.post("/webhooks/orders/create", async (req, res) => {
     console.log("🔐 HMAC Shopify  :", hmacHeader);
     console.log("🔐 HMAC Generated:", generatedHash || "(no secret set)");
 
-    // NOTE: You previously removed the strict check to make it work.
-    // If you want to enforce it later, uncomment:
-    //
-    // if (generatedHash !== hmacHeader) {
-    //   console.log("❌ HMAC verification failed");
-    //   return res.status(401).send("Unauthorized");
-    // }
 
     const order = JSON.parse(rawBody.toString("utf8"));
     console.log("📦 Order ID:", order.id);
@@ -245,7 +227,7 @@ app.post("/webhooks/orders/create", async (req, res) => {
       [
         shop,
         order.id,
-        order.name, // e.g. #1001
+        order.name, 
         order.line_items?.[0]?.title || "Unknown Product",
         `${order.customer?.first_name || ""} ${order.customer?.last_name || ""}`.trim(),
         order.customer?.email || "",
@@ -264,7 +246,7 @@ app.post("/webhooks/orders/create", async (req, res) => {
 });
 
 // -----------------------------------------------
-// 6️⃣ GET ORDERS API
+// GET ORDERS API
 // -----------------------------------------------
 app.get("/api/orders", async (req, res) => {
   try {
@@ -283,7 +265,7 @@ app.get("/api/orders", async (req, res) => {
 });
 
 // -----------------------------------------------
-// 7️⃣ CUSTOMERS API (GROUPED ORDERS)
+// CUSTOMERS API (GROUPED ORDERS)
 // -----------------------------------------------
 app.get("/api/customers", async (req, res) => {
   try {
@@ -324,7 +306,7 @@ app.get("/api/customers", async (req, res) => {
 });
 
 // -----------------------------------------------
-// 8️⃣ ANALYTICS API
+// ANALYTICS API
 // -----------------------------------------------
 app.get("/api/analytics", async (req, res) => {
   try {
@@ -334,19 +316,14 @@ app.get("/api/analytics", async (req, res) => {
       return res.status(400).json({ error: "Missing shop parameter" });
     }
 
-    // Total Orders
     const [[totalOrders]] = await db.execute(
       "SELECT COUNT(*) AS total_orders FROM shop_orders WHERE shop = ?",
       [shop]
     );
-
-    // Total Customers
     const [[totalCustomers]] = await db.execute(
       "SELECT COUNT(DISTINCT customer_email) AS total_customers FROM shop_orders WHERE shop = ?",
       [shop]
     );
-
-    // Revenue per Customer
     const [revenueByCustomer] = await db.execute(
       `
       SELECT 
@@ -361,7 +338,6 @@ app.get("/api/analytics", async (req, res) => {
       [shop]
     );
 
-    // Orders per Day
     const [ordersPerDay] = await db.execute(
       `
       SELECT 
@@ -388,7 +364,7 @@ app.get("/api/analytics", async (req, res) => {
 });
 
 // -----------------------------------------------
-// 9️⃣ FRONTEND BUILD
+// FRONTEND BUILD
 // -----------------------------------------------
 const dist = path.join(__dirname, "frontend", "dist");
 app.use(express.static(dist));
@@ -401,7 +377,7 @@ app.get("*", (req, res, next) => {
 });
 
 // -----------------------------------------------
-// 🔟 START SERVER
+// START SERVER
 // -----------------------------------------------
 app.listen(PORT, () =>
   console.log(`🚀 Server running → ${APP_URL} or http://localhost:${PORT}`)
