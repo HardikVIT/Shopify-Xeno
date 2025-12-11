@@ -379,6 +379,4 @@ app.get("*", (req, res, next) => {
 // -----------------------------------------------
 // START SERVER
 // -----------------------------------------------
-app.listen(PORT, () =>
-  console.log(`🚀 Server running → ${APP_URL} or http://localhost:${PORT}`)
-);
+export default app;
